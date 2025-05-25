@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SolanaOverEthereum</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: linear-gradient(135deg, #9945FF, #14F195);
+      color: white;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: auto;
+      padding-bottom: 100px;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 0.2em;
+    }
+    .cap-line {
+      font-size: 1.5em;
+      margin: 0.2em;
+    }
+    .btn-share {
+      margin-top: 30px;
+      padding: 12px 24px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .btn-share:hover {
+      background: #222;
+    }
+    .logos {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .logos img {
+      height: 60px;
+      margin: 10px;
+    }
+    .chart {
+      margin-top: 40px;
+      width: 90%;
+      max-width: 800px;
+    }
+  </style>
+</head>
+<body>
+  <h1>SOLANA > ETHEREUM</h1>
+  <div class="cap-line" id="solana-cap">Solana Market Cap: $LOADING...</div>
+  <div class="cap-line" id="eth-cap">Ethereum Market Cap: $LOADING...</div>
+
+  <div class="logos">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
+    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=026" alt="Ethereum Logo" style="filter: grayscale(1) brightness(0.4); transform: rotate(10deg);">
+  </div>
+
+  <div class="chart">
+    <iframe src="https://dune.com/embeds/3301160/5567950/fixed-height" width="100%" height="450" frameborder="0" scrolling="no"></iframe>
+  </div>
+
+  <button class="btn-share" onclick="share()">Track Solana flipping Ethereum here</button>
+
+  <script>
+    async function updateMarketCaps() {
+      const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=solana,ethereum";
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const sol = data.find(c => c.id === "solana");
+        const eth = data.find(c => c.id === "ethereum");
+
+        document.getElementById("solana-cap").innerText = "Solana Market Cap: $" + sol.market_cap.toLocaleString();
+        document.getElementById("eth-cap").innerText = "Ethereum Market Cap: $" + eth.market_cap.toLocaleString();
+      } catch (err) {
+        console.error("Error fetching data", err);
+      }
+    }
+
+    function share() {
+      const shareText = encodeURIComponent("Track Solana flipping Ethereum here → https://solanaoverethereum.xyz 🔥");
+      window.open(`https://twitter.com/intent/tweet?text=${shareText}`, '_blank');
+    }
+
+    updateMarketCaps();
+    setInterval(updateMarketCaps, 60000);
+  </script>
+</body>
+</html>
