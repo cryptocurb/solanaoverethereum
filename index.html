@@ -66,11 +66,11 @@
   <div class="cap-line" id="eth-cap">Ethereum Market Cap: $LOADING...</div>
 
   <div class="logos">
-    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
-    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
-    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
-    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo">
-    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=026" alt="Ethereum Logo" style="filter: grayscale(1) brightness(0.4); transform: rotate(10deg);">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo"> referrerpolicy="no-referrer">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo"> referrerpolicy="no-referrer">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo"> referrerpolicy="no-referrer">
+    <img src="https://cryptologos.cc/logos/solana-sol-logo.png?v=026" alt="Solana Logo"> referrerpolicy="no-referrer">
+    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.png?v=026" alt="Ethereum Logo" style="filter: grayscale(1) brightness(0.4); transform: rotate(10deg);"> referrerpolicy="no-referrer">
   </div>
 
   <div class="chart">
@@ -103,8 +103,8 @@
 
     async function loadChartData() {
       const [solanaData, ethereumData] = await Promise.all([
-        fetch("https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=max").then(res => res.json()),
-        fetch("https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=max").then(res => res.json())
+        fetch("https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90").then(res => res.json()),
+        fetch("https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90").then(res => res.json())
       ]);
 
       const solCaps = solanaData.market_caps;
