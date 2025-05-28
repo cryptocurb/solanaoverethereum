@@ -1,93 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SolanaOverEthereum</title>
-  <meta property="og:title" content="Solana > Ethereum" />
-  <meta property="og:description" content="Track Solana flipping Ethereum here" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: linear-gradient(135deg, #9945FF, #14F195);
-      color: white;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: auto;
-      padding-bottom: 100px;
-    }
-    h1 {
-      font-size: 12em;
-      margin-bottom: 0.2em;
-    }
-    .cap-line {
-      font-size: 2em;
-      margin: 0.2em;
-    }
-    .est-line {
-      font-size: 1.6em;
-      margin: 0.2em;
-      font-weight: bold;
-      color: #00ff00;
-    }
-    .spacer {
-      height: 30px;
-    }
-    .btn-share {
-      margin-top: 30px;
-      padding: 14px 28px;
-      background: black;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 1.2em;
-      cursor: pointer;
-    }
-    .btn-share:hover {
-      background: #222;
-    }
-    .logos {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .logos img {
-      height: 240px;
-      margin: 20px;
-      border-radius: 6px;
-    }
-    .chart {
-      margin-top: 40px;
-      width: 90%;
-      max-width: 1000px;
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-    }
-   canvas {
-  background-color: white;
-  height: 400px;
-}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title>Solana &gt; Ethereum</title>
+<meta property="og:title" content="Solana &gt; Ethereum" />
+<meta property="og:description" content="Track Solana flipping Ethereum here" />
+<meta property="og:image" content="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" />
+
+<!-- ✅ UMD build exposes a global `Chart` object -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<style>
+  body{
+    margin:0;
+    font-family:sans-serif;
+    background:linear-gradient(135deg,#9945FF,#14F195);
+    color:#fff;text-align:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:100vh;padding-bottom:100px
+  }
+  h1{font-size:12em;margin:.2em 0}
+  .cap-line{font-size:2em;margin:.2em}
+  .est-line{font-size:1.6em;margin:.2em;font-weight:bold;color:#0f0}
+  .spacer{height:30px}
+  .btn-share{margin-top:30px;padding:14px 28px;background:#000;color:#fff;border:none;border-radius:6px;font-size:1.2em;cursor:pointer}
+  .btn-share:hover{background:#222}
+  .logos{margin-top:20px;display:flex;justify-content:center;flex-wrap:wrap}
+  .logos img{height:240px;margin:20px;border-radius:6px}
+  .chart{margin-top:40px;width:90%;max-width:1000px;background:#fff;padding:20px;border-radius:8px}
+  canvas{background:#fff;height:400px}
+</style>
 </head>
+
 <body>
   <h1>SOL&gt;ETH FLIPPENING</h1>
-  <div class="cap-line" id="solanaCap">Solana Market Cap: $LOADING...</div>
-  <div class="cap-line" id="ethereumCap">Ethereum Market Cap: $LOADING...</div>
-  <div class="est-line" id="estPrice">$SOL Price at $ETH's Market Cap: $LOADING...</div>
+
+  <div class="cap-line" id="solanaCap">Solana Market Cap: $LOADING…</div>
+  <div class="cap-line" id="ethereumCap">Ethereum Market Cap: $LOADING…</div>
+  <div class="est-line" id="estPrice">$SOL Price at $ETH's Market Cap: $LOADING…</div>
+
   <div class="spacer"></div>
-  <img src="assets/sol2.png" alt="Solana Logo" style="height: 300px; border-radius: 8px;">
+  <img src="assets/sol2.png" alt="Solana logo" style="height:300px;border-radius:8px">
 
   <div class="chart">
-    <h2 style="color: black; font-size: 2em; font-weight: bold;">SOL &gt; ETH FLIPPENING</h2>
-    <canvas id="marketCapChart" style="width:100%; max-width:1000px; height:400px;"></canvas>
+    <h2 style="color:#000;font-size:2em;font-weight:bold">SOL &gt; ETH FLIPPENING</h2>
+    <canvas id="marketCapChart" style="width:100%;max-width:1000px;height:400px"></canvas>
   </div>
 
   <div class="logos">
@@ -95,115 +54,99 @@
     <img src="assets/sol4.png" alt="Solana Logo">
   </div>
 
-  <button class="btn-share" onclick="shareOnTwitter()">
-    Tweet about SOL/ETH Flippening here
-  </button>
+  <button class="btn-share" onclick="shareOnTwitter()">Tweet about SOL/ETH Flippening here</button>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    fetchMarketCaps();
-    drawChart();
+/* ---------- entry point ---------- */
+(async () => {
+  await Promise.all([updateCaps(), drawChart()]);
+})();
+
+/* ---------- helpers ---------- */
+async function fetchJSON(url){
+  const r = await fetch(url);
+  if(!r.ok) throw new Error(`${url} → ${r.status}`);
+  return r.json();
+}
+
+/* ---------- headline numbers ---------- */
+async function updateCaps(){
+  const [sol, eth] = await Promise.all([
+    fetchJSON('https://api.coingecko.com/api/v3/coins/solana?localization=false'),
+    fetchJSON('https://api.coingecko.com/api/v3/coins/ethereum?localization=false')
+  ]);
+
+  const solCap = sol.market_data.market_cap.usd;
+  const ethCap = eth.market_data.market_cap.usd;
+
+  document.getElementById('solanaCap').textContent =
+    `Solana Market Cap: $${solCap.toLocaleString()}`;
+  document.getElementById('ethereumCap').textContent =
+    `Ethereum Market Cap: $${ethCap.toLocaleString()}`;
+
+  const estPrice = ethCap / sol.market_data.circulating_supply;
+  document.getElementById('estPrice').textContent =
+    `$SOL Price at $ETH's Market Cap: $${estPrice.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+}
+
+/* ---------- share button ---------- */
+function shareOnTwitter(){
+  const url  = encodeURIComponent(location.href);
+  const text = encodeURIComponent('Track the $SOL &gt; $ETH flippening with real-time charts and stats.');
+  window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`,'_blank');
+}
+
+/* ---------- chart ---------- */
+async function drawChart(){
+  const [solHist, ethHist] = await Promise.all([
+    fetchJSON('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90&interval=daily'),
+    fetchJSON('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90&interval=daily')
+  ]);
+
+  /* line the two assets up by timestamp so missing days don’t crash the script */
+  const ethMap = new Map(ethHist.market_caps.map(([t,c]) => [t,c]));
+  const labels = [], ratios = [];
+
+  solHist.market_caps.forEach(([t,solCap])=>{
+    const ethCap = ethMap.get(t);
+    if(ethCap){
+      labels.push(new Date(t).toLocaleDateString());
+      ratios.push(solCap/ethCap);
+    }
   });
 
-  async function fetchMarketCaps() {
-    try {
-      const [solData, ethData] = await Promise.all([
-        fetch('https://api.coingecko.com/api/v3/coins/solana?localization=false').then(res => res.json()),
-        fetch('https://api.coingecko.com/api/v3/coins/ethereum?localization=false').then(res => res.json())
-      ]);
-
-      const solCap = solData.market_data.market_cap.usd;
-      const ethCap = ethData.market_data.market_cap.usd;
-
-      document.getElementById('solanaCap').textContent = `Solana Market Cap: $${solCap.toLocaleString()}`;
-      document.getElementById('ethereumCap').textContent = `Ethereum Market Cap: $${ethCap.toLocaleString()}`;
-
-      const estPrice = ethCap / solData.market_data.circulating_supply;
-      document.getElementById('estPrice').textContent =
-        `$SOL Price at $ETH's Market Cap: $${estPrice.toFixed(2).toLocaleString()}`;
-    } catch (err) {
-      console.error('Error fetching market caps:', err);
-    }
-  }
-
-  function shareOnTwitter() {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("Track the $SOL > $ETH flippening with real-time charts and stats.");
-    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-  }
-
-  async function drawChart() {
-    try {
-      const [solHist, ethHist] = await Promise.all([
-        fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90').then(res => res.json()),
-        fetch('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90').then(res => res.json())
-      ]);
-
-      const labels = solHist.market_caps.map(([timestamp]) => new Date(timestamp).toLocaleDateString());
-      const ratios = solHist.market_caps.map(([, solCap], i) => {
-        const ethCap = ethHist.market_caps[i][1];
-        return solCap / ethCap;
-      });
-
-      const ctx = document.getElementById('marketCapChart').getContext('2d');
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [
-            {
-              label: 'Solana Market Cap / Ethereum Market Cap',
-              data: ratios,
-              borderColor: '#00F0AA',
-              borderWidth: 3,
-              fill: false
-            },
-            {
-              label: 'Flippening Line',
-              data: new Array(ratios.length).fill(1),
-              borderColor: 'purple',
-              borderWidth: 2,
-              borderDash: [], // solid line
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              labels: {
-                font: { size: 16 }
-              }
-            }
-          },
-          scales: {
-            y: {
-              min: 0,
-              max: 1.1,
-              title: {
-                display: true,
-                text: 'Ratio (SOL / ETH)',
-                font: { size: 18 }
-              }
-            },
-            x: {
-              title: {
-                display: true,
-                text: 'Date',
-                font: { size: 18 }
-              }
-            }
-          }
+  const ctx = document.getElementById('marketCapChart').getContext('2d');
+  new Chart(ctx,{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {
+          label:'SOL / ETH market-cap ratio',
+          data:ratios,
+          borderColor:'#14F195',
+          borderWidth:3,
+          tension:0.3,
+        },{
+          label:'Flippening ( = 1 )',
+          data:Array(ratios.length).fill(1),
+          borderColor:'#9945FF',
+          borderWidth:2,
+          borderDash:[8,4],
         }
-      });
-    } catch (err) {
-      console.error('Chart failed to load:', err);
-      document.getElementById('marketCapChart').outerHTML =
-        "<div style='color:red;font-size:1.5em;'>Chart could not be loaded. Try again later.</div>";
+      ]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{size:14},color:'#000'}}},
+      scales:{
+        y:{min:0,max:1.1,title:{display:true,text:'Ratio (SOL / ETH)',font:{size:16}}},
+        x:{title:{display:true,text:'Date',font:{size:16}}}
+      }
     }
-  }
+  });
+}
 </script>
 </body>
 </html>
