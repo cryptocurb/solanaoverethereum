@@ -80,77 +80,49 @@
   </style>
 </head>
 <body>
-  <h1>SOL>ETH FLIPPENING</h1>
-  <div class="cap-line" id="solana-cap">Solana Market Cap: $LOADING...</div>
-  <div class="cap-line" id="eth-cap">Ethereum Market Cap: $LOADING...</div>
-  <div class="est-line" id="sol-est">$SOL Price at $ETH's Market Cap: $LOADING...</div>
-
-  <div class="logos">
-    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" alt="Solana Logo">
-  </div>
-
+  <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol1.jpg" class="top-image" alt="SOL1" />
+  <h1>SOL&gt;ETH FLIPPENING</h1>
+  <div class="cap-line">Solana Market Cap: $LOADING...</div>
+  <div class="cap-line">Ethereum Market Cap: $LOADING...</div>
+  <div class="est-line">$SOL Price at $ETH's Market Cap: $LOADING...</div>
+  <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" height="720px" style="margin: 30px 0; border-radius: 8px;" alt="Solana Logo" />
   <div class="chart">
-    <h2 style="color: black; font-size: 2.4em; margin-bottom: 10px;">SOL > ETH FLIPPENING</h2>
-    <canvas id="flipChart" width="800" height="450"></canvas>
+    <h2 style="color: black; font-size: 2em; margin-bottom: 10px;">SOL &gt; ETH FLIPPENING</h2>
+    <canvas id="flippeningChart" width="800" height="400"></canvas>
   </div>
-
   <div class="logos">
-    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol3.jpg" alt="Solana Meme 1">
-    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol4.png" alt="Solana Meme 2">
+    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol3.jpg" alt="Solana Meme 1" />
+    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol4.png" alt="Solana Meme 2" />
   </div>
-
-  <button class="btn-share" onclick="share()">Tweet about SOL/ETH Flippening here</button>
+  <button class="btn-share" onclick="shareTweet()">Tweet about SOL/ETH Flippening here</button>
 
   <script>
-    async function updateMarketCaps() {
-      const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=solana,ethereum";
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
+    async function fetchMarketCaps() {
+      const solRes = await fetch('https://api.coingecko.com/api/v3/coins/solana');
+      const ethRes = await fetch('https://api.coingecko.com/api/v3/coins/ethereum');
+      const solData = await solRes.json();
+      const ethData = await ethRes.json();
 
-        const sol = data.find(c => c.id === "solana");
-        const eth = data.find(c => c.id === "ethereum");
+      const solCap = solData.market_data.market_cap.usd;
+      const ethCap = ethData.market_data.market_cap.usd;
+      const solPrice = solData.market_data.current_price.usd;
+      const estPrice = (ethCap / solData.market_data.circulating_supply).toFixed(2);
 
-        document.getElementById("solana-cap").innerText = "Solana Market Cap: $" + sol.market_cap.toLocaleString();
-        document.getElementById("eth-cap").innerText = "Ethereum Market Cap: $" + eth.market_cap.toLocaleString();
-
-        const solEstPrice = (eth.market_cap / sol.circulating_supply).toFixed(2);
-        document.getElementById("sol-est").innerText = "$SOL Price at ETH's Market Cap: $" + solEstPrice;
-      } catch (err) {
-        console.error("Error fetching data", err);
-      }
+      document.querySelectorAll('.cap-line')[0].textContent = `Solana Market Cap: $${solCap.toLocaleString()}`;
+      document.querySelectorAll('.cap-line')[1].textContent = `Ethereum Market Cap: $${ethCap.toLocaleString()}`;
+      document.querySelector('.est-line').textContent = `$SOL Price at $ETH's Market Cap: $${estPrice}`;
     }
 
-    function share() {
-      const shareText = encodeURIComponent("Track Solana flipping Ethereum here → https://solanaoverethereum.xyz 🔥");
-      const url = `https://twitter.com/intent/tweet?text=${shareText}`;
-      window.open(url, '_blank');
-    }
+    async function drawChart() {
+      const res = await fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90');
+      const solData = await res.json();
+      const ethRes = await fetch('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90');
+      const ethData = await ethRes.json();
 
-    async function loadChartData() {
-      const [solanaData, ethereumData] = await Promise.all([
-        fetch("https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90").then(res => res.json()),
-        fetch("https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90").then(res => res.json())
-      ]);
+      const dates = solData.market_caps.map(d => new Date(d[0]).toLocaleDateString());
+      const ratio = solData.market_caps.map((d, i) => d[1] / ethData.market_caps[i][1]);
 
-      const solCaps = solanaData.market_caps;
-      const ethCaps = ethereumData.market_caps;
-
-      const commonLength = Math.min(solCaps.length, ethCaps.length);
-      const dates = [], ratios = [];
-
-      for (let i = 0; i < commonLength; i++) {
-        const time = new Date(solCaps[i][0]).toLocaleDateString();
-        const solCap = solCaps[i][1];
-        const ethCap = ethCaps[i][1];
-
-        if (solCap && ethCap && ethCap !== 0) {
-          dates.push(time);
-          ratios.push(solCap / ethCap);
-        }
-      }
-
-      const ctx = document.getElementById('flipChart').getContext('2d');
+      const ctx = document.getElementById('flippeningChart').getContext('2d');
       new Chart(ctx, {
         type: 'line',
         data: {
@@ -158,31 +130,23 @@
           datasets: [
             {
               label: 'Solana Market Cap / Ethereum Market Cap',
-              data: ratios,
-              borderColor: '#00FFB0',
-              backgroundColor: 'rgba(0, 255, 176, 0.2)',
+              data: ratio,
+              borderColor: '#00ffcc',
               borderWidth: 2,
-              pointRadius: 0,
-              tension: 0.2
+              fill: false
             },
             {
-              label: 'FLIPPENING LINE',
-              data: new Array(ratios.length).fill(1),
-              borderColor: '#aa00ff',
+              label: 'Flippening Line',
+              data: Array(ratio.length).fill(1),
+              borderColor: 'purple',
               borderWidth: 2,
-              pointRadius: 0,
               borderDash: [],
+              pointRadius: 0,
               fill: false
             }
           ]
         },
         options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              labels: { color: 'black', font: { size: 14 } }
-            }
-          },
           scales: {
             y: {
               min: 0,
@@ -190,27 +154,22 @@
               title: {
                 display: true,
                 text: 'Ratio (SOL / ETH)',
-                color: 'black',
-                font: { size: 16 }
+                color: 'black'
               },
               ticks: {
-                color: 'black',
-                callback: function(value) {
-                  if (value === 1) return '1 ← FLIPPENING LINE';
-                  return value;
-                }
+                color: 'black'
               }
             },
             x: {
-              title: {
-                display: true,
-                text: 'Date',
-                color: 'black',
-                font: { size: 16 }
-              },
               ticks: {
-                color: 'black',
-                maxTicksLimit: 10
+                color: 'black'
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              labels: {
+                color: 'black'
               }
             }
           }
@@ -218,9 +177,14 @@
       });
     }
 
-    updateMarketCaps();
-    loadChartData();
-    setInterval(updateMarketCaps, 60000);
+    function shareTweet() {
+      const tweetText = encodeURIComponent("Track the Solana > Ethereum Flippening live: https://solanaoverethereum.xyz #solana #ethereum #flippening");
+      const url = `https://twitter.com/intent/tweet?text=${tweetText}`;
+      window.open(url, '_blank');
+    }
+
+    fetchMarketCaps();
+    drawChart();
   </script>
 </body>
 </html>
