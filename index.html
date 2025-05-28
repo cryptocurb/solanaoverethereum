@@ -49,6 +49,7 @@
     .logos img {
       height: 60px;
       margin: 10px;
+      border-radius: 6px;
     }
     .chart {
       margin-top: 40px;
@@ -58,23 +59,32 @@
       padding: 20px;
       border-radius: 8px;
     }
+    .top-image {
+      margin-top: 20px;
+      max-width: 90%;
+      height: auto;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
+  <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol1.jpg" alt="Solana Meme" class="top-image">
+
   <h1>SOLANA > ETHEREUM</h1>
   <div class="cap-line" id="solana-cap">Solana Market Cap: $LOADING...</div>
   <div class="cap-line" id="eth-cap">Ethereum Market Cap: $LOADING...</div>
 
   <div class="logos">
-    <img src="https://raw.githubusercontent.com/solana-labs/explorer/main/public/favicon.ico" alt="Solana Logo">
-    <img src="https://cryptocurrencyliveprices.com/img/solana.png" alt="Solana Logo">
-    <img src="https://upload.wikimedia.org/wikipedia/en/b/b9/Solana_logo.png" alt="Solana Logo">
-    <img src="https://cryptologos.cc/logos/solana-sol-logo.svg" alt="Solana Logo">
-    <img src="https://cryptologos.cc/logos/ethereum-eth-logo.svg" alt="Ethereum Logo" style="filter: grayscale(1) brightness(0.4); transform: rotate(10deg);">
+    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" alt="Solana Logo">
   </div>
 
   <div class="chart">
     <canvas id="flipChart" width="800" height="450"></canvas>
+  </div>
+
+  <div class="logos">
+    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol3.jpg" alt="Solana Logo">
+    <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol4.png" alt="Solana Logo">
   </div>
 
   <button class="btn-share" onclick="share()">Track Solana flipping Ethereum here</button>
