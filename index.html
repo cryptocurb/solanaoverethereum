@@ -71,9 +71,10 @@
       padding: 20px;
       border-radius: 8px;
     }
-    canvas {
-      background-color: white;
-    }
+   canvas {
+  background-color: white;
+  height: 400px;
+}
   </style>
 </head>
 <body>
@@ -98,98 +99,108 @@
     Tweet about SOL/ETH Flippening here
   </button>
 
-  <script>
-    async function fetchMarketCaps() {
-      try {
-        const [solData, ethData] = await Promise.all([
-          fetch('https://api.coingecko.com/api/v3/coins/solana?localization=false').then(res => res.json()),
-          fetch('https://api.coingecko.com/api/v3/coins/ethereum?localization=false').then(res => res.json())
-        ]);
+<script>
+  async function fetchMarketCaps() {
+    try {
+      const [solData, ethData] = await Promise.all([
+        fetch('https://api.coingecko.com/api/v3/coins/solana?localization=false').then(res => res.json()),
+        fetch('https://api.coingecko.com/api/v3/coins/ethereum?localization=false').then(res => res.json())
+      ]);
 
-        const solCap = solData.market_data.market_cap.usd;
-        const ethCap = ethData.market_data.market_cap.usd;
-        const solPrice = solData.market_data.current_price.usd;
+      const solCap = solData.market_data.market_cap.usd;
+      const ethCap = ethData.market_data.market_cap.usd;
 
-        document.getElementById('solanaCap').textContent = `Solana Market Cap: $${solCap.toLocaleString()}`;
-        document.getElementById('ethereumCap').textContent = `Ethereum Market Cap: $${ethCap.toLocaleString()}`;
+      document.getElementById('solanaCap').textContent = `Solana Market Cap: $${solCap.toLocaleString()}`;
+      document.getElementById('ethereumCap').textContent = `Ethereum Market Cap: $${ethCap.toLocaleString()}`;
 
-        const estPrice = ethCap / solData.market_data.circulating_supply;
-        document.getElementById('estPrice').textContent = `$SOL Price at $ETH's Market Cap: $${estPrice.toFixed(2).toLocaleString()}`;
-      } catch (err) {
-        console.error('Error fetching market caps:', err);
-      }
+      const estPrice = ethCap / solData.market_data.circulating_supply;
+      document.getElementById('estPrice').textContent =
+        `$SOL Price at $ETH's Market Cap: $${estPrice.toFixed(2).toLocaleString()}`;
+    } catch (err) {
+      console.error('Error fetching market caps:', err);
     }
+  }
 
-    fetchMarketCaps();
+  fetchMarketCaps();
 
-    function shareOnTwitter() {
-      const url = encodeURIComponent(window.location.href);
-      const text = encodeURIComponent("Track the $SOL > $ETH flippening with real-time charts and stats.");
-      window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
-    }
+  function shareOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("Track the $SOL > $ETH flippening with real-time charts and stats.");
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+  }
 
-    async function drawChart() {
-      try {
-        const [solHist, ethHist] = await Promise.all([
-          fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90').then(res => res.json()),
-          fetch('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90').then(res => res.json())
-        ]);
+  async function drawChart() {
+    try {
+      const [solHist, ethHist] = await Promise.all([
+        fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90').then(res => res.json()),
+        fetch('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90').then(res => res.json())
+      ]);
 
-        const labels = solHist.market_caps.map(([timestamp]) => new Date(timestamp).toLocaleDateString());
-        const ratios = solHist.market_caps.map(([, solCap], i) => {
-          const ethCap = ethHist.market_caps[i][1];
-          return solCap / ethCap;
-        });
+      const labels = solHist.market_caps.map(([timestamp]) => new Date(timestamp).toLocaleDateString());
+      const ratios = solHist.market_caps.map(([, solCap], i) => {
+        const ethCap = ethHist.market_caps[i][1];
+        return solCap / ethCap;
+      });
 
-        const ctx = document.getElementById('marketCapChart').getContext('2d');
-        new Chart(ctx, {
-          type: 'line',
-          data: {
-            labels,
-            datasets: [
-              {
-                label: 'Solana Market Cap / Ethereum Market Cap',
-                data: ratios,
-                borderColor: '#00F0AA',
-                borderWidth: 2,
-                fill: false
-              },
-              {
-                label: 'Flippening Line',
-                data: new Array(ratios.length).fill(1),
-                borderColor: 'purple',
-                borderWidth: 2,
-                fill: false
+      const ctx = document.getElementById('marketCapChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Solana Market Cap / Ethereum Market Cap',
+              data: ratios,
+              borderColor: '#00F0AA',
+              borderWidth: 3,
+              fill: false
+            },
+            {
+              label: 'Flippening Line',
+              data: new Array(ratios.length).fill(1),
+              borderColor: 'purple',
+              borderWidth: 2,
+              borderDash: [], // solid line
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: {
+                font: { size: 16 }
               }
-            ]
+            }
           },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                min: 0,
-                max: 1.1,
-                title: {
-                  display: true,
-                  text: 'Ratio (SOL / ETH)'
-                }
-              },
-              x: {
-                title: {
-                  display: true,
-                  text: 'Date'
-                }
+          scales: {
+            y: {
+              min: 0,
+              max: 1.1,
+              title: {
+                display: true,
+                text: 'Ratio (SOL / ETH)',
+                font: { size: 18 }
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date',
+                font: { size: 18 }
               }
             }
           }
-        });
-      } catch (err) {
-        console.error('Error drawing chart:', err);
-      }
+        }
+      });
+    } catch (err) {
+      console.error('Error drawing chart:', err);
     }
+  }
 
-    drawChart();
-  </script>
+  drawChart();
+</script>
 </body>
 </html>
