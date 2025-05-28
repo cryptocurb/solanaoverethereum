@@ -87,7 +87,7 @@
 
   <div class="chart">
     <h2 style="color: black; font-size: 2em; font-weight: bold;">SOL &gt; ETH FLIPPENING</h2>
-    <canvas id="marketCapChart"></canvas>
+    <canvas id="marketCapChart" style="width:100%; max-width:1000px; height:400px;"></canvas>
   </div>
 
   <div class="logos">
@@ -100,6 +100,11 @@
   </button>
 
 <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    fetchMarketCaps();
+    drawChart();
+  });
+
   async function fetchMarketCaps() {
     try {
       const [solData, ethData] = await Promise.all([
@@ -120,8 +125,6 @@
       console.error('Error fetching market caps:', err);
     }
   }
-
-  fetchMarketCaps();
 
   function shareOnTwitter() {
     const url = encodeURIComponent(window.location.href);
@@ -196,11 +199,11 @@
         }
       });
     } catch (err) {
-      console.error('Error drawing chart:', err);
+      console.error('Chart failed to load:', err);
+      document.getElementById('marketCapChart').outerHTML =
+        "<div style='color:red;font-size:1.5em;'>Chart could not be loaded. Try again later.</div>";
     }
   }
-
-  drawChart();
 </script>
 </body>
 </html>
