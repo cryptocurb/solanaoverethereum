@@ -30,6 +30,10 @@
       font-size: 2em;
       margin: 0.2em;
     }
+    .est-line {
+      font-size: 1.6em;
+      margin: 0.2em;
+    }
     .btn-share {
       margin-top: 30px;
       padding: 14px 28px;
@@ -74,9 +78,10 @@
   </style>
 </head>
 <body>
-  <h1>SOL > ETH FLIPPENING</h1>
+  <h1>SOL>ETH FLIPPENING</h1>
   <div class="cap-line" id="solana-cap">Solana Market Cap: $LOADING...</div>
   <div class="cap-line" id="eth-cap">Ethereum Market Cap: $LOADING...</div>
+  <div class="est-line" id="sol-est">Estimated SOL Price at ETH's Market Cap: $LOADING...</div>
 
   <div class="logos">
     <img src="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" alt="Solana Logo">
@@ -106,6 +111,9 @@
 
         document.getElementById("solana-cap").innerText = "Solana Market Cap: $" + sol.market_cap.toLocaleString();
         document.getElementById("eth-cap").innerText = "Ethereum Market Cap: $" + eth.market_cap.toLocaleString();
+
+        const solEstPrice = (eth.market_cap / sol.circulating_supply).toFixed(2);
+        document.getElementById("sol-est").innerText = "Estimated SOL Price at ETH's Market Cap: $" + solEstPrice;
       } catch (err) {
         console.error("Error fetching data", err);
       }
