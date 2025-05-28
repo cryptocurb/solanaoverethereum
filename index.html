@@ -115,7 +115,7 @@
         document.getElementById("eth-cap").innerText = "Ethereum Market Cap: $" + eth.market_cap.toLocaleString();
 
         const solEstPrice = (eth.market_cap / sol.circulating_supply).toFixed(2);
-        document.getElementById("sol-est").innerText = "Estimated SOL Price at ETH's Market Cap: $" + solEstPrice;
+        document.getElementById("sol-est").innerText = "$SOL Price at ETH's Market Cap: $" + solEstPrice;
       } catch (err) {
         console.error("Error fetching data", err);
       }
