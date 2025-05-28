@@ -1,10 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SolanaOverEthereum</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
       margin: 0;
@@ -54,6 +54,9 @@
       margin-top: 40px;
       width: 90%;
       max-width: 800px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -71,7 +74,7 @@
   </div>
 
   <div class="chart">
-    <iframe src="https://dune.com/embeds/3301160/5567950/fixed-height" width="100%" height="450" frameborder="0" scrolling="no"></iframe>
+    <canvas id="flipChart" width="800" height="450"></canvas>
   </div>
 
   <button class="btn-share" onclick="share()">Track Solana flipping Ethereum here</button>
@@ -98,7 +101,70 @@
       window.open(`https://twitter.com/intent/tweet?text=${shareText}`, '_blank');
     }
 
+    async function loadChartData() {
+      const [solanaData, ethereumData] = await Promise.all([
+        fetch("https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=max").then(res => res.json()),
+        fetch("https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=max").then(res => res.json())
+      ]);
+
+      const solCaps = solanaData.market_caps;
+      const ethCaps = ethereumData.market_caps;
+
+      const commonLength = Math.min(solCaps.length, ethCaps.length);
+      const dates = [], ratios = [];
+
+      for (let i = 0; i < commonLength; i++) {
+        const time = new Date(solCaps[i][0]).toLocaleDateString();
+        const solCap = solCaps[i][1];
+        const ethCap = ethCaps[i][1];
+
+        if (solCap && ethCap && ethCap !== 0) {
+          dates.push(time);
+          ratios.push(solCap / ethCap);
+        }
+      }
+
+      const ctx = document.getElementById('flipChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Solana Market Cap / Ethereum Market Cap',
+            data: ratios,
+            borderColor: '#00FFB0',
+            backgroundColor: 'rgba(0, 255, 176, 0.2)',
+            borderWidth: 2,
+            pointRadius: 0,
+            tension: 0.2
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Ratio (SOL / ETH)'
+              }
+            },
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              },
+              ticks: {
+                maxTicksLimit: 10
+              }
+            }
+          }
+        }
+      });
+    }
+
     updateMarketCaps();
+    loadChartData();
     setInterval(updateMarketCaps, 60000);
   </script>
 </body>
