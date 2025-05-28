@@ -37,7 +37,7 @@
       color: #00ff00;
     }
     .spacer {
-      height: 20px;
+      height: 30px;
     }
     .btn-share {
       margin-top: 30px;
@@ -77,7 +77,6 @@
   </style>
 </head>
 <body>
-
   <h1>SOL&gt;ETH FLIPPENING</h1>
   <div class="cap-line" id="solanaCap">Solana Market Cap: $LOADING...</div>
   <div class="cap-line" id="ethereumCap">Ethereum Market Cap: $LOADING...</div>
@@ -87,12 +86,12 @@
 
   <div class="chart">
     <h2 style="color: black; font-size: 2em; font-weight: bold;">SOL &gt; ETH FLIPPENING</h2>
-    <canvas id="marketCapChart" width="800" height="400"></canvas>
+    <canvas id="marketCapChart"></canvas>
   </div>
 
   <div class="logos">
-    <img src="assets/sol3.jpg" alt="Solana Logo" style="height: 240px;">
-    <img src="assets/sol4.png" alt="Solana Logo" style="height: 240px;">
+    <img src="assets/sol3.jpg" alt="Solana Logo">
+    <img src="assets/sol4.png" alt="Solana Logo">
   </div>
 
   <button class="btn-share" onclick="shareOnTwitter()">
@@ -160,7 +159,6 @@
                 data: new Array(ratios.length).fill(1),
                 borderColor: 'purple',
                 borderWidth: 2,
-                borderDash: [],
                 fill: false
               }
             ]
