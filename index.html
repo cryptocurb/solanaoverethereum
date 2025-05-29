@@ -1,63 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <title>Solana &gt; Ethereum Flippening</title>
-  <meta property="og:title" content="Solana &gt; Ethereum" />
-  <meta property="og:description" content="Track Solana flipping Ethereum here" />
-  <meta property="og:image" content="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" />
+<title>Solana &gt; Ethereum Flippening</title>
+<meta property="og:title" content="Solana &gt; Ethereum" />
+<meta property="og:description" content="Track Solana flipping Ethereum here" />
+<meta property="og:image" content="https://raw.githubusercontent.com/cryptocurb/solanaoverethereum/main/assets/sol2.png" />
 
-  <!-- UMD build exposes a global `Chart` object -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- UMD build exposes a global `Chart` object -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-  <style>
-    /* ─────  layout  ───── */
-    body{
-      margin:0;
-      font-family:sans-serif;
-      background:linear-gradient(135deg,#9945FF,#14F195);
-      color:#fff;
-      text-align:center;
-      overflow-x:hidden;          /* ← prevents sideways scrolling */
-      display:flex;
-      flex-direction:column;
-      align-items:center;         /* keep everything centred horizontally */
-      justify-content:flex-start; /* regular vertical flow */
-      min-height:100vh;
-      padding-bottom:100px;
-    }
+<style>
+/* ─── RESET / BASICS ─────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#9945FF,#14F195);
+  color:#fff;text-align:center;
+  overflow-x:hidden;
+  display:flex;flex-direction:column;align-items:center;
+  min-height:100vh;padding-bottom:100px;
+}
 
-    /* ─────  headline & stats  ───── */
-    h1{font-size:12em;margin:.2em 0}
-    .cap-line{font-size:2em;margin:.2em}
-    .est-line{font-size:1.6em;margin:.2em;font-weight:bold;color:#0f0}
-    .spacer{height:30px}
+/* ─── TYPOGRAPHY ─────────────────────────────────────────────────── */
+h1{
+  /* grows from 3 rem on tiny screens up to 12 rem on desktop */
+  font-size:clamp(3rem,10vw,12rem);
+  margin:.2em 0
+}
+.cap-line{font-size:clamp(1.1rem,4.5vw,2rem);margin:.2em}
+.est-line{
+  font-size:clamp(1rem,3.5vw,1.6rem);
+  margin:.2em;font-weight:bold;color:#0f0
+}
+h2{color:#000;font-size:clamp(1.4rem,6vw,2rem);font-weight:bold;margin:0 0 10px}
 
-    /* ─────  chart card  ───── */
-    .chart{
-      margin-top:40px;
-      width:90%;
-      max-width:1000px;
-      height:500px;               /* ← fixed height; no more runaway blank space */
-      background:#fff;
-      padding:20px;
-      border-radius:8px;
-      box-sizing:border-box;
-    }
-    /* let Chart.js fill the parent’s height */
-    #marketCapChart{width:100%!important;height:100%!important;display:block}
+/* ─── CHART CARD ─────────────────────────────────────────────────── */
+.chart{
+  width:95%;
+  max-width:1000px;
+  height:clamp(260px,70vw,500px);  /* flex with screen but capped */
+  background:#fff;
+  padding:20px;border-radius:8px;margin-top:40px
+}
+#marketCapChart{width:100%!important;height:100%!important;display:block}
 
-    /* ─────  misc  ───── */
-    .btn-share{
-      margin-top:30px;padding:14px 28px;
-      background:#000;color:#fff;border:none;border-radius:6px;font-size:1.2em;cursor:pointer
-    }
-    .btn-share:hover{background:#222}
-    .logos{margin-top:20px;display:flex;justify-content:center;flex-wrap:wrap}
-    .logos img{height:240px;margin:20px;border-radius:6px}
-  </style>
+/* ─── IMAGES ─────────────────────────────────────────────────────── */
+img.hero{width:80%;max-width:300px;height:auto;border-radius:8px}
+.logos{
+  margin-top:20px;display:flex;justify-content:center;flex-wrap:wrap;gap:20px
+}
+.logos img{height:180px;width:auto;border-radius:6px}
+@media(min-width:600px){.logos img{height:240px}}
+
+/* ─── BUTTON ─────────────────────────────────────────────────────── */
+.btn-share{
+  margin-top:30px;padding:14px 28px;background:#000;color:#fff;
+  border:none;border-radius:6px;font-size:clamp(1rem,4vw,1.2rem);cursor:pointer
+}
+.btn-share:hover{background:#222}
+</style>
 </head>
 
 <body>
@@ -67,12 +72,10 @@
   <div class="cap-line" id="ethereumCap">Ethereum Market Cap: $LOADING…</div>
   <div class="est-line" id="estPrice">$SOL Price at $ETH's Market Cap: $LOADING…</div>
 
-  <div class="spacer"></div>
-
-  <img src="assets/sol2.png" alt="Solana logo" style="height:300px;border-radius:8px">
+  <img src="assets/sol2.png" alt="Solana logo" class="hero">
 
   <div class="chart">
-    <h2 style="color:#000;font-size:2em;font-weight:bold">SOL &gt; ETH FLIPPENING</h2>
+    <h2>SOL &gt; ETH FLIPPENING</h2>
     <canvas id="marketCapChart"></canvas>
   </div>
 
@@ -86,20 +89,19 @@
   </button>
 
 <script>
-/* ─────────────────────────────  utilities  ───────────────────────────── */
+/* ─── utilities ─────────────────────────────────────────── */
 const $ = id => document.getElementById(id);
 const fetchJSON = url => fetch(url).then(r=>{
   if(!r.ok) throw new Error(`${url} → ${r.status}`);
   return r.json();
 });
 
-/* ─────────────────────────────  headline stats  ─────────────────────── */
+/* ─── numbers at top ────────────────────────────────────── */
 async function updateCaps(){
   const [sol, eth] = await Promise.all([
     fetchJSON('https://api.coingecko.com/api/v3/coins/solana?localization=false'),
     fetchJSON('https://api.coingecko.com/api/v3/coins/ethereum?localization=false')
   ]);
-
   const solCap = sol.market_data.market_cap.usd;
   const ethCap = eth.market_data.market_cap.usd;
 
@@ -111,30 +113,25 @@ async function updateCaps(){
     `$SOL Price at $ETH's Market Cap: $${estPrice.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 }
 
-/* ─────────────────────────────  share  ──────────────────────────────── */
+/* ─── share button ──────────────────────────────────────── */
 function shareOnTwitter(){
   const url  = encodeURIComponent(location.href);
   const text = encodeURIComponent('Track the $SOL > $ETH flippening with real-time charts and stats.');
   window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`,'_blank');
 }
 
-/* ─────────────────────────────  chart  ──────────────────────────────── */
+/* ─── chart ─────────────────────────────────────────────── */
 async function drawChart(){
   const [solHist, ethHist] = await Promise.all([
     fetchJSON('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90&interval=daily'),
     fetchJSON('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90&interval=daily')
   ]);
 
-  /* line the two assets up by timestamp so missing days don’t crash us */
-  const ethMap = new Map(ethHist.market_caps.map(([t,c]) => [t,c]));
+  const ethMap = new Map(ethHist.market_caps.map(([t,c])=>[t,c]));
   const labels = [], ratios = [];
-
   solHist.market_caps.forEach(([t,solCap])=>{
     const ethCap = ethMap.get(t);
-    if(ethCap){
-      labels.push(new Date(t).toLocaleDateString());
-      ratios.push(solCap / ethCap);
-    }
+    if(ethCap){labels.push(new Date(t).toLocaleDateString());ratios.push(solCap/ethCap);}
   });
 
   new Chart($('marketCapChart').getContext('2d'),{
@@ -142,41 +139,24 @@ async function drawChart(){
     data:{
       labels,
       datasets:[
-        {
-          label:'SOL / ETH market-cap ratio',
-          data:ratios,
-          borderColor:'#14F195',
-          borderWidth:3,
-          tension:0.3,
-          pointRadius:2
-        },{
-          label:'Flippening ( = 1 )',
-          data:Array(ratios.length).fill(1),
-          borderColor:'#9945FF',
-          borderWidth:2,
-          borderDash:[8,4],
-          pointRadius:0
-        }
+        {label:'SOL / ETH market-cap ratio',data:ratios,borderColor:'#14F195',borderWidth:3,tension:.3,pointRadius:2},
+        {label:'Flippening ( = 1 )',data:Array(ratios.length).fill(1),borderColor:'#9945FF',borderWidth:2,borderDash:[8,4],pointRadius:0}
       ]
     },
     options:{
       responsive:true,
-      aspectRatio:2.4,            /* width ÷ height, keeps the card tidy */
-      plugins:{
-        legend:{labels:{font:{size:14},color:'#000'}}
-      },
+      aspectRatio:2.4,
+      plugins:{legend:{labels:{font:{size:14},color:'#000'}}},
       scales:{
         y:{min:0,max:1.1,title:{display:true,text:'Ratio (SOL / ETH)',font:{size:16}}},
-        x:{title:{display:true,text:'Date',font:{size:16}}}
+        x:{title:{display:true,text:'Date',font:{size:16}},ticks:{maxRotation:70,minRotation:45}}
       }
     }
   });
 }
 
-/* ─────────────────────────────  kick things off  ───────────────────── */
-(async ()=>{
-  await Promise.all([updateCaps(), drawChart()]);
-})();
+/* ─── kick it off ───────────────────────────────────────── */
+(async()=>{await Promise.all([updateCaps(),drawChart()]);})();
 </script>
 </body>
 </html>
