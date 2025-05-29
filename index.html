@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
-/* ─── RESET / BASICS ─────────────────────────────────────────────── */
+/* ─── CORE LAYOUT ──────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
@@ -21,45 +21,35 @@ body{
   background:linear-gradient(135deg,#9945FF,#14F195);
   color:#fff;text-align:center;
   overflow-x:hidden;
-  display:flex;flex-direction:column;align-items:center;
   min-height:100vh;padding-bottom:100px;
 }
 
-/* ─── TYPOGRAPHY ─────────────────────────────────────────────────── */
-h1{
-  /* grows from 3 rem on tiny screens up to 12 rem on desktop */
-  font-size:clamp(3rem,10vw,12rem);
-  margin:.2em 0
-}
+/* ─── TYPOGRAPHY ───────────────────────────────────────────────────── */
+h1{font-size:clamp(3rem,10vw,12rem);margin:.2em 0}
 .cap-line{font-size:clamp(1.1rem,4.5vw,2rem);margin:.2em}
-.est-line{
-  font-size:clamp(1rem,3.5vw,1.6rem);
-  margin:.2em;font-weight:bold;color:#0f0
-}
+.est-line{font-size:clamp(1rem,3.5vw,1.6rem);margin:.2em;font-weight:bold;color:#0f0}
 h2{color:#000;font-size:clamp(1.4rem,6vw,2rem);font-weight:bold;margin:0 0 10px}
 
-/* ─── CHART CARD ─────────────────────────────────────────────────── */
-.chart{
-  width:95%;
-  max-width:1000px;
-  height:clamp(260px,70vw,500px);  /* flex with screen but capped */
-  background:#fff;
-  padding:20px;border-radius:8px;margin-top:40px
-}
-#marketCapChart{width:100%!important;height:100%!important;display:block}
-
-/* ─── IMAGES ─────────────────────────────────────────────────────── */
-img.hero{width:80%;max-width:300px;height:auto;border-radius:8px}
-.logos{
-  margin-top:20px;display:flex;justify-content:center;flex-wrap:wrap;gap:20px
-}
+/* ─── IMAGES ───────────────────────────────────────────────────────── */
+img.hero{width:80%;max-width:300px;height:auto;border-radius:8px;display:block;margin-inline:auto}
+.logos{margin-top:20px;display:flex;justify-content:center;flex-wrap:wrap;gap:20px}
 .logos img{height:180px;width:auto;border-radius:6px}
 @media(min-width:600px){.logos img{height:240px}}
 
-/* ─── BUTTON ─────────────────────────────────────────────────────── */
+/* ─── CHART CARD ───────────────────────────────────────────────────── */
+.chart{
+  width:min(95%,1000px);
+  height:clamp(260px,70vw,500px);  /* flexes with screen, capped for desktop */
+  background:#fff;border-radius:8px;
+  padding:20px;margin-top:40px
+}
+#marketCapChart{width:100%!important;height:100%!important;display:block}
+
+/* ─── SHARE BUTTON ─────────────────────────────────────────────────── */
 .btn-share{
   margin-top:30px;padding:14px 28px;background:#000;color:#fff;
-  border:none;border-radius:6px;font-size:clamp(1rem,4vw,1.2rem);cursor:pointer
+  border:0;border-radius:6px;cursor:pointer;
+  font-size:clamp(1rem,4vw,1.2rem)
 }
 .btn-share:hover{background:#222}
 </style>
@@ -70,7 +60,7 @@ img.hero{width:80%;max-width:300px;height:auto;border-radius:8px}
 
   <div class="cap-line" id="solanaCap">Solana Market Cap: $LOADING…</div>
   <div class="cap-line" id="ethereumCap">Ethereum Market Cap: $LOADING…</div>
-  <div class="est-line" id="estPrice">$SOL Price at $ETH's Market Cap: $LOADING…</div>
+  <div class="est-line" id="estPrice">$SOL Price at $ETH's Market Cap: $LOADING…</div>
 
   <img src="assets/sol2.png" alt="Solana logo" class="hero">
 
@@ -85,18 +75,17 @@ img.hero{width:80%;max-width:300px;height:auto;border-radius:8px}
   </div>
 
   <button class="btn-share" onclick="shareOnTwitter()">
-    Tweet about SOL/ETH Flippening here
+    Tweet about SOL/ETH Flippening here
   </button>
 
 <script>
-/* ─── utilities ─────────────────────────────────────────── */
+/* ─── small helpers ────────────────────────────────────────────────── */
 const $ = id => document.getElementById(id);
 const fetchJSON = url => fetch(url).then(r=>{
-  if(!r.ok) throw new Error(`${url} → ${r.status}`);
-  return r.json();
+  if(!r.ok) throw new Error(`${url} → ${r.status}`); return r.json();
 });
 
-/* ─── numbers at top ────────────────────────────────────── */
+/* ─── top‑of‑page numbers ─────────────────────────────────────────── */
 async function updateCaps(){
   const [sol, eth] = await Promise.all([
     fetchJSON('https://api.coingecko.com/api/v3/coins/solana?localization=false'),
@@ -104,58 +93,73 @@ async function updateCaps(){
   ]);
   const solCap = sol.market_data.market_cap.usd;
   const ethCap = eth.market_data.market_cap.usd;
-
   $('solanaCap').textContent  = `Solana Market Cap: $${solCap.toLocaleString()}`;
   $('ethereumCap').textContent = `Ethereum Market Cap: $${ethCap.toLocaleString()}`;
-
-  const estPrice = ethCap / sol.market_data.circulating_supply;
-  $('estPrice').textContent =
-    `$SOL Price at $ETH's Market Cap: $${estPrice.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+  const est = ethCap/sol.market_data.circulating_supply;
+  $('estPrice').textContent = `$SOL Price at $ETH's Market Cap: $${est.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
 }
 
-/* ─── share button ──────────────────────────────────────── */
-function shareOnTwitter(){
-  const url  = encodeURIComponent(location.href);
-  const text = encodeURIComponent('Track the $SOL > $ETH flippening with real-time charts and stats.');
+/* ─── share button ────────────────────────────────────────────────── */
+const shareOnTwitter = () =>{
+  const url=encodeURIComponent(location.href);
+  const text=encodeURIComponent('Track the $SOL > $ETH flippening with real‑time charts and stats.');
   window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`,'_blank');
-}
+};
 
-/* ─── chart ─────────────────────────────────────────────── */
+/* ─── the chart ───────────────────────────────────────────────────── */
 async function drawChart(){
   const [solHist, ethHist] = await Promise.all([
     fetchJSON('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=usd&days=90&interval=daily'),
     fetchJSON('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=90&interval=daily')
   ]);
 
-  const ethMap = new Map(ethHist.market_caps.map(([t,c])=>[t,c]));
-  const labels = [], ratios = [];
+  /* line‑up by timestamp so missing days don’t hit undefined */
+  const ethMap=new Map(ethHist.market_caps.map(([t,c])=>[t,c]));
+  const labels=[],ratios=[];
   solHist.market_caps.forEach(([t,solCap])=>{
-    const ethCap = ethMap.get(t);
+    const ethCap=ethMap.get(t);
     if(ethCap){labels.push(new Date(t).toLocaleDateString());ratios.push(solCap/ethCap);}
   });
+
+  /* responsive tweaks */
+  const isMobile = window.innerWidth < 600;
 
   new Chart($('marketCapChart').getContext('2d'),{
     type:'line',
     data:{
       labels,
       datasets:[
-        {label:'SOL / ETH market-cap ratio',data:ratios,borderColor:'#14F195',borderWidth:3,tension:.3,pointRadius:2},
-        {label:'Flippening ( = 1 )',data:Array(ratios.length).fill(1),borderColor:'#9945FF',borderWidth:2,borderDash:[8,4],pointRadius:0}
+        {label:'SOL / ETH market‑cap ratio',data:ratios,borderColor:'#14F195',borderWidth:3,tension:.3,pointRadius:isMobile?0:2},
+        {label:'Flippening (=1)',data:Array(ratios.length).fill(1),borderColor:'#9945FF',borderWidth:2,borderDash:[8,4],pointRadius:0}
       ]
     },
     options:{
       responsive:true,
-      aspectRatio:2.4,
-      plugins:{legend:{labels:{font:{size:14},color:'#000'}}},
+      aspectRatio:isMobile?1.2:2.4,
+      layout:{padding:{left:isMobile?0:10,right:10,top:0,bottom:isMobile?10:20}},
+      plugins:{
+        legend:{display:!isMobile,labels:{font:{size:isMobile?11:14},color:'#000'}}
+      },
       scales:{
-        y:{min:0,max:1.1,title:{display:true,text:'Ratio (SOL / ETH)',font:{size:16}}},
-        x:{title:{display:true,text:'Date',font:{size:16}},ticks:{maxRotation:70,minRotation:45}}
+        y:{
+          min:0,max:1.1,
+          title:{display:!isMobile,text:'Ratio (SOL / ETH)',font:{size:isMobile?12:16}},
+          ticks:{font:{size:isMobile?10:12}}
+        },
+        x:{
+          ticks:{
+            font:{size:isMobile?10:12},
+            autoSkip:true,maxTicksLimit:isMobile?5:undefined,
+            maxRotation:isMobile?30:60,minRotation:isMobile?30:45
+          },
+          title:{display:!isMobile,text:'Date',font:{size:isMobile?12:16}}
+        }
       }
     }
   });
 }
 
-/* ─── kick it off ───────────────────────────────────────── */
+/* ─── init ─────────────────────────────────────────────────────────── */
 (async()=>{await Promise.all([updateCaps(),drawChart()]);})();
 </script>
 </body>
